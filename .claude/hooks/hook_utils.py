@@ -22,12 +22,12 @@ def parse_hook_input():
 
 def log(event_type, data=None, base_filename="hook"):
     """
-    Simple JSON-only logging function using JSONL format
+    Simple JSON logging function with pretty formatting
     
     Args:
         event_type: Type of event (e.g., "tool_blocked", "session_end", "notification")
         data: Dictionary of structured data for JSON log (optional)
-        base_filename: Base name for log files (will create .jsonl file)
+        base_filename: Base name for log files (will create .json file)
     """
     os.makedirs(LOGS_DIR, exist_ok=True)
     timestamp = datetime.now().isoformat()
@@ -42,7 +42,7 @@ def log(event_type, data=None, base_filename="hook"):
     if data:
         json_entry.update(data)
     
-    # Append to JSONL file with pretty formatting
-    jsonl_path = os.path.join(LOGS_DIR, f"{base_filename}.jsonl")
-    with open(jsonl_path, 'a') as f:
+    # Append to JSON file with pretty formatting
+    json_path = os.path.join(LOGS_DIR, f"{base_filename}.json")
+    with open(json_path, 'a') as f:
         f.write(json.dumps(json_entry, indent=2) + '\n')

@@ -34,42 +34,40 @@ A collection of hooks for [Claude Code](https://github.com/anthropics/claude-cod
 
 ## Available Hooks
 
-### pre_tool_use.py ✅ Working
-- Logs all tool usage to `~/.claude/logs/tool-usage.log` and `.json`
-- Logs bash commands to `~/.claude/logs/command-history.log` and `.json`
+### pre_tool_use.py
+- Logs all tool usage to `tool-usage.json` with structured data
+- Logs bash commands to `command-history.json` with session tracking
 - Blocks `git commit --no-verify` and `git commit -n` commands with LLM-friendly explanations
-- Logs security blocks to `~/.claude/logs/security.log` and `.json`
+- Logs security blocks to `security.json` with detailed context
 
-### post_tool_use.py ✅ Working
-- Logs tool execution results to `~/.claude/logs/post_tool_use.json` and `.log`
-- Tracks tool success/failure status
+### post_tool_use.py
+- Logs tool execution results to `post_tool_use.json`
+- Tracks tool success/failure status with session context
 
-### notification.py ✅ Working
-- Logs all Claude Code notifications to `~/.claude/logs/notifications.log`
-- Also saves structured data to `~/.claude/logs/notifications.json`
-- Captures permission requests and other notifications
+### notification.py
+- Logs all Claude Code notifications to `notifications.json`
+- Captures permission requests and other notifications with structured data
 
-### stop.py ✅ Working
-- Logs session end events to `~/.claude/logs/sessions.log`
-- Saves session summaries to `~/.claude/logs/sessions.json`
+### stop.py
+- Logs session end events to `sessions.json`
 - Prints session summary to console
 - **Note**: Only triggers when Claude Code session ends
 
-### subagent_stop.py ✅ Working
-- Logs subagent completion events to `~/.claude/logs/subagents.log`
-- Tracks subagent lifecycle in `~/.claude/logs/subagents.json`
+### subagent_stop.py
+- Logs subagent completion events to `subagents.json`
+- Tracks subagent lifecycle with session context
 - **Note**: Only triggers when subagents (Task tool) complete
 
 ## Usage
 
-Once installed, hooks run automatically. Check logs at:
-- `~/.claude/logs/tool-usage.log` - All tools used by Claude
-- `~/.claude/logs/command-history.log` - All bash commands executed
-- `~/.claude/logs/security.log` - Blocked dangerous commands
-- `~/.claude/logs/post_tool_use.json` - Tool execution results
-- `~/.claude/logs/notifications.log` - Claude notifications
-- `~/.claude/logs/sessions.log` - Session lifecycle events
-- `~/.claude/logs/subagents.log` - Subagent events
+Once installed, hooks run automatically. Check logs in your project's `.claude/logs/` directory:
+- `tool-usage.json` - All tools used by Claude with structured data
+- `command-history.json` - All bash commands executed with session tracking
+- `security.json` - Blocked dangerous commands with detailed context
+- `post_tool_use.json` - Tool execution results and success/failure status
+- `notifications.json` - Claude notifications and permission requests
+- `sessions.json` - Session lifecycle events
+- `subagents.json` - Subagent (Task tool) events
 
 ## Configuration Examples
 
