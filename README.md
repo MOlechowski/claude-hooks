@@ -6,7 +6,6 @@ A collection of hooks for [Claude Code](https://github.com/anthropics/claude-cod
 
 - **Security**: Block dangerous commands (e.g., `git --no-verify`)
 - **Logging**: Track all tool usage and bash commands
-- **Extensible**: Easy to add new hooks and behaviors
 
 ## Requirements
 
