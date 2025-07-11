@@ -49,7 +49,7 @@ def main():
     tool_input = hook_input.get("tool_input", {})
     session_id = hook_input.get("session_id", "")
     
-    log("tool_use", f"Tool: {tool_name}", {
+    log("tool_use", {
         "session_id": session_id,
         "tool_name": tool_name,
         "tool_input": tool_input
@@ -58,7 +58,7 @@ def main():
     if tool_name == "Bash":
         cmd = tool_input.get("command", "")
         
-        log("command", f"Command: {cmd}", {
+        log("command", {
             "session_id": session_id,
             "command": cmd
         }, "command-history")
@@ -72,7 +72,7 @@ def main():
         should_block, message = check_bash_command(tokens)
         
         if should_block:
-            log("security_block", f"Command blocked: {message}", {
+            log("security_block", {
                 "session_id": session_id,
                 "command": cmd,
                 "action": "blocked",

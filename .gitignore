@@ -24,4 +24,8 @@ logs/
 # Testing
 .coverage
 .pytest_cache/
-htmlcov/CLAUDE.md
+htmlcov/
+
+# Claude local settings
+.claude/settings.local.json
+.claude/logs/

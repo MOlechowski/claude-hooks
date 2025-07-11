@@ -15,11 +15,11 @@ def main():
     subagent_id = hook_input.get('subagent_id', 'unknown')
     transcript_path = hook_input.get('transcript_path', '')
     
-    log("subagent_end", f"Subagent ended: {subagent_id} (session: {session_id})", {
+    log("subagent_end", {
         "session_id": session_id,
         "subagent_id": subagent_id,
         "event": "subagent_ended",
-        "transcript_path": transcript_path,
+        "transcript_path": transcript_path
     }, "subagents")
     
     sys.exit(0)

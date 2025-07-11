@@ -15,10 +15,10 @@ def main():
     message = hook_input.get('message', '')
     session_id = hook_input.get('session_id', '')
     
-    log("notification", f"{notification_type}: {message}", {
+    log("notification", {
         "notification_type": notification_type,
         "message": message,
-        "session_id": session_id,
+        "session_id": session_id
     }, "notifications")
     
     sys.exit(0)

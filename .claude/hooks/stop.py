@@ -14,10 +14,10 @@ def main():
     session_id = hook_input.get('session_id', 'unknown')
     transcript_path = hook_input.get('transcript_path', '')
     
-    log("session_end", f"Session ended: {session_id}", {
+    log("session_end", {
         "session_id": session_id,
         "event": "session_ended",
-        "transcript_path": transcript_path,
+        "transcript_path": transcript_path
     }, "sessions")
     
     from datetime import datetime

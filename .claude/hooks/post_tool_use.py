@@ -15,11 +15,10 @@ def main():
     success = hook_input.get('success', True)
     session_id = hook_input.get('session_id', '')
     
-    status = "succeeded" if success else "failed"
-    log("tool_result", f"Tool {tool_name} {status}", {
+    log("tool_result", {
         "session_id": session_id,
         "tool_name": tool_name,
-        "success": success,
+        "success": success
     }, "post_tool_use")
     
     sys.exit(0)
