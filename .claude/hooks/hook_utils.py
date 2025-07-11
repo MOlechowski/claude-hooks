@@ -9,7 +9,8 @@ import os
 import sys
 from datetime import datetime
 
-LOGS_DIR = os.path.expanduser('~/.claude/logs')
+# Save logs in the current project's .claude/logs directory
+LOGS_DIR = os.path.join(os.getcwd(), '.claude', 'logs')
 
 def parse_hook_input():
     """Parse JSON input from stdin"""
