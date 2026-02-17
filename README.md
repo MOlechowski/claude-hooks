@@ -6,6 +6,7 @@ A collection of hooks for [Claude Code](https://github.com/anthropics/claude-cod
 
 - **Security**: Block dangerous commands (e.g., `git --no-verify`)
 - **Logging**: Track all tool usage and bash commands
+- **Session Memory**: Preserve context across `/compact` by logging session activity and structuring it at compaction time
 
 ## Requirements
 
@@ -56,6 +57,33 @@ A collection of hooks for [Claude Code](https://github.com/anthropics/claude-cod
 - Logs subagent completion events to `subagents.json`
 - Tracks subagent lifecycle with session context
 - **Note**: Only triggers when subagents (Task tool) complete
+
+### Session Memory Hooks
+
+Four hooks that replicate Claude Code's experimental session memory feature. They preserve context across `/compact` by logging session activity during work and structuring it at compaction time.
+
+#### session_memory_init.py (SessionStart)
+- Creates per-session log file at `~/.claude/session-memory/<session_id>.md`
+- Records session start time and working directory
+
+#### session_memory_log_prompt.py (UserPromptSubmit)
+- Appends timestamped user messages to the session log
+- Truncates long prompts to 2000 chars
+
+#### session_memory_log_tool.py (PostToolUse)
+- Appends tool usage summaries with smart truncation per tool type:
+  - **Read/Write**: file path only
+  - **Edit**: file path + old/new strings (100 chars each)
+  - **Bash**: command + first 200 chars of output
+  - **Grep/Glob**: pattern + first 5 result lines
+  - **WebSearch/WebFetch**: query/URL only
+  - **Task**: description only
+
+#### session_memory_pre_compact.py (PreCompact, 60s timeout)
+- Reads accumulated session log and structures it via API call
+- Outputs structured notes to stdout, which Claude Code injects into the compaction summarizer
+- **Fallback chain**: `claude -p --model opus` (subscription) → `ANTHROPIC_API_KEY` curl → raw log injection
+- Structures notes into 8 sections: Task specification, Files and Functions, Workflow, Errors & Corrections, Codebase and System Documentation, Learnings, Key results, Current State
 
 ## Usage
 
