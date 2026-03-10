@@ -9,9 +9,7 @@ import shutil
 import subprocess
 import sys
 
-from hook_utils import parse_hook_input
-
-MEMORY_DIR = os.path.join(os.path.expanduser("~"), ".claude", "session-memory")
+from hook_utils import parse_hook_input, MEMORY_DIR
 MAX_LOG_CHARS = 30000
 MIN_LOG_LINES = 5
 RAW_FALLBACK_CHARS = 5000

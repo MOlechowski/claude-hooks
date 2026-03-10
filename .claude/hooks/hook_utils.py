@@ -12,6 +12,9 @@ from datetime import datetime
 # Save logs in the current project's .claude/logs directory
 LOGS_DIR = os.path.join(os.getcwd(), '.claude', 'logs')
 
+# Session memory directory (absolute path, shared by all session memory hooks)
+MEMORY_DIR = os.path.join(os.path.expanduser("~"), ".claude", "session-memory")
+
 def parse_hook_input():
     """Parse JSON input from stdin"""
     try:
