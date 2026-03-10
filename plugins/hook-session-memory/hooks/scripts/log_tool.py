@@ -1,7 +1,4 @@
-#!/usr/bin/env -S uv run
-# /// script
-# requires-python = ">=3.10"
-# ///
+#!/usr/bin/env python3
 """PostToolUse hook: log tool usage to session memory with smart truncation"""
 
 import json
@@ -9,7 +6,17 @@ import os
 import sys
 from datetime import datetime
 
-from hook_utils import parse_hook_input, MEMORY_DIR
+# === LOG DIRECTORY ===
+MEMORY_DIR = os.path.join(os.path.expanduser("~"), ".claude", "logs", "session-memory")
+
+
+def parse_hook_input():
+    """Parse JSON input from stdin"""
+    try:
+        return json.loads(sys.stdin.read())
+    except json.JSONDecodeError:
+        print("Error: Invalid JSON input", file=sys.stderr)
+        sys.exit(1)
 
 
 def truncate(text, max_chars):
@@ -81,7 +88,6 @@ def build_summary(tool_name, tool_input, tool_response):
     if tool_name == "Task":
         return f"Task: {inp.get('description', '?')}"
 
-    # Default: tool name + truncated input
     return f"{tool_name}: {truncate(safe_str(inp), 200)}"
 
 
