@@ -1,15 +1,23 @@
-#!/usr/bin/env -S uv run
-# /// script
-# requires-python = ">=3.10"
-# ///
+#!/usr/bin/env python3
 """UserPromptSubmit hook: log user messages to session memory"""
 
+import json
 import os
 import sys
 from datetime import datetime
 
-from hook_utils import parse_hook_input, MEMORY_DIR
+# === LOG DIRECTORY ===
+MEMORY_DIR = os.path.join(os.path.expanduser("~"), ".claude", "logs", "session-memory")
 MAX_PROMPT_LENGTH = 2000
+
+
+def parse_hook_input():
+    """Parse JSON input from stdin"""
+    try:
+        return json.loads(sys.stdin.read())
+    except json.JSONDecodeError:
+        print("Error: Invalid JSON input", file=sys.stderr)
+        sys.exit(1)
 
 
 def main():

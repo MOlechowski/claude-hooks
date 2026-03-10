@@ -1,15 +1,14 @@
-#!/usr/bin/env -S uv run
-# /// script
-# requires-python = ">=3.10"
-# ///
+#!/usr/bin/env python3
 """PreCompact hook: structure accumulated session log via claude -p, inject into compaction"""
 
+import json
 import os
 import shutil
 import subprocess
 import sys
 
-from hook_utils import parse_hook_input, MEMORY_DIR
+# === LOG DIRECTORY ===
+MEMORY_DIR = os.path.join(os.path.expanduser("~"), ".claude", "logs", "session-memory")
 MAX_LOG_CHARS = 30000
 MIN_LOG_LINES = 5
 RAW_FALLBACK_CHARS = 5000
@@ -47,6 +46,15 @@ _What was being worked on most recently. Next steps._
 Here is the raw session log:
 
 """
+
+
+def parse_hook_input():
+    """Parse JSON input from stdin"""
+    try:
+        return json.loads(sys.stdin.read())
+    except json.JSONDecodeError:
+        print("Error: Invalid JSON input", file=sys.stderr)
+        sys.exit(1)
 
 
 def find_claude_binary():
@@ -98,8 +106,6 @@ def try_api_call(prompt):
     if not api_key:
         return None
 
-    import json
-
     payload = json.dumps({
         "model": "claude-haiku-4-5-20251001",
         "max_tokens": 4096,
@@ -145,17 +151,14 @@ def main():
     with open(log_file) as f:
         log_content = f.read()
 
-    # Skip if log is effectively empty
     if len(log_content.splitlines()) < MIN_LOG_LINES:
         sys.exit(0)
 
-    # Truncate from beginning if too large (keep recent context)
     if len(log_content) > MAX_LOG_CHARS:
         log_content = "[... earlier entries truncated ...]\n\n" + log_content[-MAX_LOG_CHARS:]
 
     prompt = STRUCTURING_PROMPT + log_content
 
-    # Try methods in order: claude -p → API key → raw fallback
     structured = try_claude_cli(prompt)
     if not structured:
         structured = try_api_call(prompt)
@@ -168,7 +171,6 @@ def main():
         )
         print(structured)
     else:
-        # Fallback: inject raw log
         print(
             "Use the following session activity log to preserve important context "
             "during compaction:\n"

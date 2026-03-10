@@ -1,183 +1,90 @@
-# Claude Code Hooks Collection
+# Claude Code Hooks
 
-A collection of hooks for [Claude Code](https://github.com/anthropics/claude-code) to enhance security, logging, and control.
-
-## Features
-
-- **Security**: Block dangerous commands (e.g., `git --no-verify`)
-- **Logging**: Track all tool usage and bash commands
-- **Session Memory**: Preserve context across `/compact` by logging session activity and structuring it at compaction time
-
-## Requirements
-
-- [UV](https://github.com/astral-sh/uv) - Fast Python package manager
-  ```bash
-  # Install with Homebrew (macOS/Linux)
-  brew install uv
-  
-  # Or install with curl
-  curl -LsSf https://astral.sh/uv/install.sh | sh
-  ```
+A plugin marketplace for [Claude Code](https://github.com/anthropics/claude-code) hooks — security, observability, and session memory.
 
 ## Installation
 
-1. Clone this repository
-2. Copy the entire `.claude` directory to your home directory:
-   ```bash
-   cp -r .claude ~/.claude
-   ```
-   Or if you already have hooks, just copy the hooks directory:
-   ```bash
-   cp -r .claude/hooks/* ~/.claude/hooks/
-   ```
-3. The `settings.json` file includes all hook registrations. If you already have a `~/.claude/settings.json`, merge the hooks configuration.
-
-## Available Hooks
-
-### pre_tool_use.py
-- Logs all tool usage to `tool-usage.json` with structured data
-- Logs bash commands to `command-history.json` with session tracking
-- Blocks `git commit --no-verify` and `git commit -n` commands with LLM-friendly explanations
-- Logs security blocks to `security.json` with detailed context
-
-### post_tool_use.py
-- Logs tool execution results to `post_tool_use.json`
-- Tracks tool success/failure status with session context
-
-### notification.py
-- Logs all Claude Code notifications to `notifications.json`
-- Captures permission requests and other notifications with structured data
-
-### stop.py
-- Logs session end events to `sessions.json`
-- Prints session summary to console
-- **Note**: Only triggers when Claude Code session ends
-
-### subagent_stop.py
-- Logs subagent completion events to `subagents.json`
-- Tracks subagent lifecycle with session context
-- **Note**: Only triggers when subagents (Task tool) complete
-
-### Session Memory Hooks
-
-Four hooks that replicate Claude Code's experimental session memory feature. They preserve context across `/compact` by logging session activity during work and structuring it at compaction time.
-
-#### session_memory_init.py (SessionStart)
-- Creates per-session log file at `~/.claude/session-memory/<session_id>.md`
-- Records session start time and working directory
-
-#### session_memory_log_prompt.py (UserPromptSubmit)
-- Appends timestamped user messages to the session log
-- Truncates long prompts to 2000 chars
-
-#### session_memory_log_tool.py (PostToolUse)
-- Appends tool usage summaries with smart truncation per tool type:
-  - **Read/Write**: file path only
-  - **Edit**: file path + old/new strings (100 chars each)
-  - **Bash**: command + first 200 chars of output
-  - **Grep/Glob**: pattern + first 5 result lines
-  - **WebSearch/WebFetch**: query/URL only
-  - **Task**: description only
-
-#### session_memory_pre_compact.py (PreCompact, 60s timeout)
-- Reads accumulated session log and structures it via API call
-- Outputs structured notes to stdout, which Claude Code injects into the compaction summarizer
-- **Fallback chain**: `claude -p --model opus` (subscription) → `ANTHROPIC_API_KEY` curl → raw log injection
-- Structures notes into 8 sections: Task specification, Files and Functions, Workflow, Errors & Corrections, Codebase and System Documentation, Learnings, Key results, Current State
-
-## Usage
-
-Once installed, hooks run automatically. Check logs in your project's `.claude/logs/` directory:
-- `tool-usage.json` - All tools used by Claude with structured data
-- `command-history.json` - All bash commands executed with session tracking
-- `security.json` - Blocked dangerous commands with detailed context
-- `post_tool_use.json` - Tool execution results and success/failure status
-- `notifications.json` - Claude notifications and permission requests
-- `sessions.json` - Session lifecycle events
-- `subagents.json` - Subagent (Task tool) events
-
-## Configuration Examples
-
-The `pre_tool_use.py` hook uses a `BLOCKED_TOOLS` configuration to block dangerous commands. You can extend it by adding more rules:
-
-```python
-BLOCKED_TOOLS = {
-    "Bash": {
-        # Block all git commit --no-verify commands
-        "git": {
-            "commit": {
-                "flags": ["--no-verify", "-n"],
-                "message": (
-                    "Cannot execute: git commit with --no-verify flag bypasses "
-                    "pre-commit hooks and may introduce issues. Consider running "
-                    "without --no-verify to ensure code quality checks pass."
-                )
-            }
-        },
-        
-        # Example: Block dangerous rm commands
-        "rm": {
-            "patterns": [
-                ["-rf", "/"],
-                ["-fr", "/"],
-                ["/*"]
-            ],
-            "message": (
-                "Cannot execute: recursive force removal of root directory would "
-                "delete entire filesystem. This operation is irreversible and would "
-                "destroy the system."
-            )
-        },
-        
-        # Example: Block all sudo commands
-        "sudo": {
-            "*": {
-                "message": (
-                    "Cannot execute: elevated privileges not permitted in this "
-                    "environment. Operations requiring sudo access must be performed "
-                    "through authorized channels."
-                )
-            }
-        },
-        
-        # Example: Block specific docker commands
-        "docker": {
-            "rm": {
-                "flags": ["-f", "--force"],
-                "message": (
-                    "Cannot execute: force removal of docker containers may cause "
-                    "data loss. Please stop containers gracefully before removal."
-                )
-            }
-        }
-    }
-}
+```bash
+/plugin install MOlechowski/claude-hooks
 ```
 
-### Configuration Structure
+Then enable individual plugins:
 
-- **Program level**: First key is the command (e.g., "git", "rm", "sudo")
-- **Subcommand level**: Second key is the subcommand (e.g., "commit" for git)
-- **Wildcard**: Use "*" to block all usage of a command
-- **Flags**: List of flags that trigger blocking
-- **Patterns**: List of token combinations that must all be present
-- **Message**: LLM-friendly explanation of why the command is blocked
+```bash
+/plugin enable hook-security
+/plugin enable hook-observability
+/plugin enable hook-session-memory
+```
 
-### Writing LLM-Friendly Messages
+## Plugins
 
-Good blocking messages should:
-1. Start with "Cannot execute:" to clearly indicate the action is blocked
-2. Explain WHY the command is dangerous
-3. Suggest safer alternatives when possible
-4. Be specific about potential consequences
+### hook-security
 
-Examples:
-- ✅ "Cannot execute: git commit with --no-verify flag bypasses pre-commit hooks and may introduce issues. Consider running without --no-verify to ensure code quality checks pass."
-- ❌ "Git --no-verify blocked"
+Blocks dangerous CLI commands before execution.
 
-## Contributing
+| Hook Event | Matcher | Action |
+|------------|---------|--------|
+| PreToolUse | `Bash` | Block commands matching `BLOCKED_TOOLS` rules |
 
-Feel free to submit PRs with new hooks or improvements!
+**Default rules:**
+- `git commit --no-verify` / `git commit -n` — blocked with explanation
+
+**Extending rules:** Edit `BLOCKED_TOOLS` in `plugins/hook-security/hooks/scripts/pre_tool_use.py` to add patterns for `rm`, `sudo`, `docker`, etc.
+
+### hook-observability
+
+Logs all tool usage, results, notifications, and session events.
+
+| Hook Event | Script | Log File |
+|------------|--------|----------|
+| PreToolUse | `log_tool_use.py` | `tool-usage.jsonl`, `command-history.jsonl` |
+| PostToolUse | `log_tool_result.py` | `post_tool_use.jsonl` |
+| Notification | `log_notification.py` | `notifications.jsonl` |
+| Stop | `log_session_end.py` | `sessions.jsonl` |
+| SubagentStop | `log_subagent_end.py` | `subagents.jsonl` |
+
+### hook-session-memory
+
+Preserves session context across `/compact` by logging activity and structuring notes at compaction time.
+
+| Hook Event | Script | Action |
+|------------|--------|--------|
+| SessionStart | `init.py` | Create per-session log file |
+| UserPromptSubmit | `log_prompt.py` | Append user messages (max 2000 chars) |
+| PostToolUse | `log_tool.py` | Append tool summaries with smart truncation |
+| PreCompact | `pre_compact.py` | Structure notes via `claude -p` / API / raw fallback (60s timeout) |
+
+**Structured note sections:** Task specification, Files and Functions, Workflow, Errors & Corrections, Codebase and System Documentation, Learnings, Key results, Current State.
+
+## Log Locations
+
+| Plugin | Directory |
+|--------|-----------|
+| hook-security | `~/.claude/logs/security/` |
+| hook-observability | `~/.claude/logs/observability/` |
+| hook-session-memory | `~/.claude/logs/session-memory/` |
+
+## Local Testing
+
+```bash
+# Test individual plugins
+claude --plugin-dir ./plugins/hook-security
+claude --plugin-dir ./plugins/hook-observability
+claude --plugin-dir ./plugins/hook-session-memory
+
+# Test all plugins together
+claude --plugin-dir ./plugins/hook-security --plugin-dir ./plugins/hook-observability --plugin-dir ./plugins/hook-session-memory
+```
+
+## Requirements
+
+- Python 3.10+
+- Claude Code CLI
+
+## Known Limitations
+
+- Plugin hooks fire in Claude Code CLI only (not VSCode extension — [known bug](https://github.com/anthropics/claude-code/issues))
+- `pre_compact.py` requires either `claude` CLI on PATH or `ANTHROPIC_API_KEY` env var for structured notes; falls back to raw log injection otherwise
 
 ## License
 

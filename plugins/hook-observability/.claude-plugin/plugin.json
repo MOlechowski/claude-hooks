@@ -1,0 +1,5 @@
+{
+  "name": "hook-observability",
+  "version": "1.0.0",
+  "description": "Hooks for logging all tool usage, results, notifications, session ends, and subagent completions to ~/.claude/logs/observability/."
+}

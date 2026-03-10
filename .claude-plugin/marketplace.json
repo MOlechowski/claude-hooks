@@ -1,0 +1,32 @@
+{
+  "name": "claude-hooks",
+  "version": "1.0.0",
+  "description": "Claude Code hook plugins for security, observability, and session memory",
+  "owner": {
+    "name": "MOlechowski",
+    "email": "michal@olechowski.cloud"
+  },
+  "plugins": [
+    {
+      "name": "hook-security",
+      "description": "PreToolUse hook that blocks dangerous commands (git commit --no-verify). Logs security blocks to ~/.claude/logs/security/.",
+      "source": "./plugins/hook-security",
+      "category": "security",
+      "version": "1.0.0"
+    },
+    {
+      "name": "hook-observability",
+      "description": "Hooks for logging all tool usage, results, notifications, session ends, and subagent completions to ~/.claude/logs/observability/.",
+      "source": "./plugins/hook-observability",
+      "category": "observability",
+      "version": "1.0.0"
+    },
+    {
+      "name": "hook-session-memory",
+      "description": "Hooks for preserving session context across /compact. Logs user prompts, tool usage, and structures notes at compaction time.",
+      "source": "./plugins/hook-session-memory",
+      "category": "productivity",
+      "version": "1.0.0"
+    }
+  ]
+}

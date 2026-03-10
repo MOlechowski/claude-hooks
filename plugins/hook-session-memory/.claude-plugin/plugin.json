@@ -1,0 +1,5 @@
+{
+  "name": "hook-session-memory",
+  "version": "1.0.0",
+  "description": "Hooks for preserving session context across /compact. Logs user prompts, tool usage, and structures notes at compaction time."
+}
