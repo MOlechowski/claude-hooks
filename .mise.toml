@@ -1,0 +1,10 @@
+# Base tool versions — shared across all environments
+[tools]
+actionlint = "latest"
+cocogitto = "7"
+gitleaks = "latest"
+markdownlint-cli2 = "latest"
+ruff = "latest"
+task = "3"
+"pipx:pre-commit-hooks" = "latest"
+"pipx:yamllint" = "latest"

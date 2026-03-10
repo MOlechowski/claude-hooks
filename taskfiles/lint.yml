@@ -1,0 +1,46 @@
+version: '3'
+
+tasks:
+  default:
+    desc: Run all linters
+    cmds:
+      - task: python
+      - task: json
+      - task: actionlint
+      - task: yamllint
+      - task: markdownlint
+
+  python:
+    desc: Lint Python files
+    cmds:
+      - ruff check plugins/
+
+  json:
+    desc: Validate JSON files
+    cmds:
+      - find . -name '*.json' -not -path './.git/*' -exec check-json {} +
+
+  actionlint:
+    desc: Lint GitHub Actions workflows
+    cmds:
+      - actionlint -color -oneline
+
+  yamllint:
+    desc: Lint YAML files
+    cmds:
+      - yamllint --strict .
+
+  markdownlint:
+    desc: Lint Markdown files
+    cmds:
+      - markdownlint-cli2 "**/*.md"
+
+  gitleaks:
+    desc: Check staged files for secrets
+    cmds:
+      - gitleaks protect --staged --verbose
+
+  gitleaks-full:
+    desc: Check entire repo for secrets
+    cmds:
+      - gitleaks detect --verbose

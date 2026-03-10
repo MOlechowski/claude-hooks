@@ -1,0 +1,43 @@
+pre-commit:
+  parallel: true
+  commands:
+    trailing-whitespace:
+      glob: "*.{py,yaml,yml,md,json,toml}"
+      run: |
+        if grep -Hn '[[:blank:]]$' {staged_files} 2>/dev/null; then
+          echo "Trailing whitespace found"
+          exit 1
+        fi
+      fail_text: "trailing whitespace found"
+
+    end-of-file-newline:
+      glob: "*.{py,yaml,yml,md,json,toml}"
+      run: |
+        for f in {staged_files}; do
+          if [ -s "$f" ] && [ -n "$(tail -c1 "$f")" ]; then
+            echo "$f: no newline at end of file"
+            exit 1
+          fi
+        done
+      fail_text: "files must end with newline"
+
+    check-large-files:
+      run: |
+        MAX_KB=500
+        for f in {staged_files}; do
+          size=$(wc -c < "$f" 2>/dev/null || echo 0)
+          if [ "$size" -gt $((MAX_KB * 1024)) ]; then
+            echo "$f exceeds ${MAX_KB}KB"
+            exit 1
+          fi
+        done
+      fail_text: "file exceeds 500KB limit"
+
+    check-merge-conflict:
+      glob: "*.{py,yaml,yml,md,json,toml}"
+      run: |
+        if grep -Hn '^<<<<<<< \|^=======$\|^>>>>>>> ' {staged_files} 2>/dev/null; then
+          echo "Merge conflict markers found"
+          exit 1
+        fi
+      fail_text: "merge conflict markers found"

@@ -1,0 +1,10 @@
+pre-commit:
+  commands:
+    python-syntax:
+      glob: "*.py"
+      run: task lint:python
+      fail_text: "ruff found issues"
+    json-validate:
+      glob: "*.json"
+      run: task lint:json
+      fail_text: "invalid JSON syntax"

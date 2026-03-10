@@ -1,0 +1,12 @@
+version: '3'
+
+tasks:
+  lint:
+    desc: Run all linters (CI)
+    cmds:
+      - task lint
+
+  commit-lint:
+    desc: Check commit messages follow conventional commits
+    cmds:
+      - cog check --from-latest-tag || cog check
