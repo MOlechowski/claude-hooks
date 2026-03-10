@@ -6,6 +6,11 @@ tasks:
     cmds:
       - task lint
 
+  test:
+    desc: Run all tests (CI)
+    cmds:
+      - task test
+
   commit-lint:
     desc: Check commit messages follow conventional commits
     cmds:

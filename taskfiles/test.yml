@@ -1,0 +1,12 @@
+version: '3'
+
+tasks:
+  default:
+    desc: Run all tests
+    cmds:
+      - task: security
+
+  security:
+    desc: Run hook-security tests (unit + integration)
+    cmds:
+      - uv run -m unittest discover -s plugins/hook-security/hooks/scripts/tests -v
