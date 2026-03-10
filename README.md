@@ -80,7 +80,7 @@ claude --plugin-dir ./plugins/hook-security --plugin-dir ./plugins/hook-observab
 
 ## Known Limitations
 
-- `pre_compact.py` requires `claude` CLI on PATH for structured notes; falls back to raw log injection otherwise
+- `pre_compact.py` requires `claude` CLI on PATH for structured notes; silently skips if unavailable
 
 ## License
 
