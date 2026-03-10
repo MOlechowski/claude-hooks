@@ -11,7 +11,6 @@ import sys
 MEMORY_DIR = os.path.join(os.path.expanduser("~"), ".claude", "logs", "session-memory")
 MAX_LOG_CHARS = 30000
 MIN_LOG_LINES = 5
-RAW_FALLBACK_CHARS = 5000
 
 STRUCTURING_PROMPT = """Structure this raw session activity log into organized technical notes \
 for preserving context across a conversation compaction. Use this exact template — fill in \
@@ -124,19 +123,16 @@ def main():
 
     structured = try_claude_cli(prompt)
 
-    if structured:
-        print(
-            "IMPORTANT: Use the following structured session notes to preserve context "
-            "during compaction. These notes capture the key details from the session "
-            "that should be retained in the summary:\n"
-        )
-        print(structured)
-    else:
-        print(
-            "Use the following session activity log to preserve important context "
-            "during compaction:\n"
-        )
-        print(log_content[-RAW_FALLBACK_CHARS:])
+    if not structured:
+        print("session-memory: claude CLI not found or structuring failed", file=sys.stderr)
+        sys.exit(1)
+
+    print(
+        "IMPORTANT: Use the following structured session notes to preserve context "
+        "during compaction. These notes capture the key details from the session "
+        "that should be retained in the summary:\n"
+    )
+    print(structured)
 
     sys.exit(0)
 
