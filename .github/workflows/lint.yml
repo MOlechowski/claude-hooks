@@ -35,4 +35,4 @@ jobs:
         with:
           fetch-depth: 0
       - uses: jdx/mise-action@v2
-      - run: task ci:commit-lint
+      - run: cog check ${{ github.event.pull_request.base.sha }}..${{ github.event.pull_request.head.sha }}
