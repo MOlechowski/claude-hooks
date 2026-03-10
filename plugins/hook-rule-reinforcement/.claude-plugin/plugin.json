@@ -1,0 +1,5 @@
+{
+  "name": "hook-rule-reinforcement",
+  "version": "1.0.0",
+  "description": "Context-aware rule reinforcement via UserPromptSubmit. Reads CLAUDE.md/AGENTS.md, distills relevant rules per prompt using claude -p, and injects them into every message."
+}
