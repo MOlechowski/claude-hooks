@@ -1,0 +1,8 @@
+rc: .lefthookrc
+
+extends:
+  - lefthook/files.yml
+  - lefthook/lint.yml
+  - lefthook/python.yml
+  - lefthook/commits.yml
+  - lefthook/secrets.yml

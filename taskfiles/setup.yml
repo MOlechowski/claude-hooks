@@ -1,0 +1,8 @@
+version: '3'
+
+tasks:
+  default:
+    desc: Install tools and git hooks
+    cmds:
+      - mise install
+      - lefthook install
