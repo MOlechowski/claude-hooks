@@ -48,40 +48,49 @@ def main():
     tool_name = hook_input.get("tool_name", "unknown")
     tool_input = hook_input.get("tool_input", {})
     session_id = hook_input.get("session_id", "")
-    
-    log("tool_use", {
-        "session_id": session_id,
-        "tool_name": tool_name,
-        "tool_input": tool_input
-    }, "tool-usage")
-    
+
+    try:
+        log("tool_use", {
+            "session_id": session_id,
+            "tool_name": tool_name,
+            "tool_input": tool_input
+        }, "tool-usage")
+    except OSError:
+        pass
+
     if tool_name == "Bash":
         cmd = tool_input.get("command", "")
-        
-        log("command", {
-            "session_id": session_id,
-            "command": cmd
-        }, "command-history")
-        
+
+        try:
+            log("command", {
+                "session_id": session_id,
+                "command": cmd
+            }, "command-history")
+        except OSError:
+            pass
+
         try:
             tokens = shlex.split(cmd) if cmd else []
         except ValueError:
             # Malformed command, let Claude handle it
             tokens = cmd.split() if cmd else []
-        
+
         should_block, message = check_bash_command(tokens)
-        
+
         if should_block:
-            log("security_block", {
-                "session_id": session_id,
-                "command": cmd,
-                "action": "blocked",
-                "message": message
-            }, "security")
-            
+            try:
+                log("security_block", {
+                    "session_id": session_id,
+                    "command": cmd,
+                    "action": "blocked",
+                    "message": message
+                }, "security")
+            except OSError:
+                pass
+
             print(f"Command blocked: {message}", file=sys.stderr)
             sys.exit(2)
-    
+
     sys.exit(0)
 
 if __name__ == "__main__":

@@ -22,8 +22,8 @@ def main():
     
     from datetime import datetime
     timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-    print(f"\nSession completed at {timestamp}")
-    print(f"Logs available at: {LOGS_DIR}")
+    print(f"\nSession completed at {timestamp}", file=sys.stderr)
+    print(f"Logs available at: {LOGS_DIR}", file=sys.stderr)
     
     sys.exit(0)
 
