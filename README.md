@@ -49,7 +49,7 @@ Preserves session context across `/compact` by logging activity and structuring 
 | SessionStart     | `init.py`         | Create per-session log file                                        |
 | UserPromptSubmit | `log_prompt.py`   | Append user messages (max 2000 chars)                              |
 | PostToolUse      | `log_tool.py`     | Append tool summaries with smart truncation                        |
-| PreCompact       | `pre_compact.py`  | Structure notes via `claude -p` / API / raw fallback (60s timeout) |
+| PreCompact       | `pre_compact.py`  | Structure notes via `claude -p` (60s timeout)                      |
 
 **Structured note sections:** Task specification, Files and Functions, Workflow, Errors & Corrections, Codebase and System Documentation, Learnings, Key results, Current State.
 
@@ -78,9 +78,18 @@ claude --plugin-dir ./plugins/hook-security --plugin-dir ./plugins/hook-observab
 - Python 3.10+
 - Claude Code CLI
 
+## Development
+
+```bash
+task setup         # Install tools (mise) and git hooks (lefthook)
+task lint          # Run all linters
+```
+
+Requires [mise](https://mise.jdx.dev/) for tool management. See `.mise.toml` for tool versions.
+
 ## Known Limitations
 
-- `pre_compact.py` requires `claude` CLI on PATH for structured notes; silently skips if unavailable
+- `pre_compact.py` requires `claude` CLI on PATH for structured notes; fails with exit code 1 if unavailable
 
 ## License
 
