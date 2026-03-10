@@ -1,3 +1,5 @@
+rc: .lefthookrc
+
 extends:
   - lefthook/files.yml
   - lefthook/lint.yml
