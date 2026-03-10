@@ -9,10 +9,10 @@
   "plugins": [
     {
       "name": "hook-security",
-      "description": "PreToolUse hook that blocks dangerous commands (git commit --no-verify). Logs security blocks to ~/.claude/logs/security/.",
+      "description": "PreToolUse hook that blocks dangerous commands via configurable rules.json. Logs security events to ~/.claude/logs/security/.",
       "source": "./plugins/hook-security",
       "category": "security",
-      "version": "1.0.0"
+      "version": "1.1.0"
     },
     {
       "name": "hook-observability",
@@ -25,6 +25,13 @@
       "name": "hook-session-memory",
       "description": "Hooks for preserving session context across /compact. Logs user prompts, tool usage, and structures notes at compaction time.",
       "source": "./plugins/hook-session-memory",
+      "category": "productivity",
+      "version": "1.0.0"
+    },
+    {
+      "name": "hook-rule-reinforcement",
+      "description": "Context-aware rule reinforcement. Reads CLAUDE.md/AGENTS.md, selects relevant rules per prompt via claude -p, injects into every message.",
+      "source": "./plugins/hook-rule-reinforcement",
       "category": "productivity",
       "version": "1.0.0"
     }

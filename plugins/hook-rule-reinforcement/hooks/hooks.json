@@ -1,0 +1,17 @@
+{
+  "description": "Reinforce CLAUDE.md/AGENTS.md rules every prompt",
+  "hooks": {
+    "UserPromptSubmit": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "uv run ${CLAUDE_PLUGIN_ROOT}/hooks/scripts/reinforce_rules.py",
+            "timeout": 15
+          }
+        ]
+      }
+    ]
+  }
+}

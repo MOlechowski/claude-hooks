@@ -18,7 +18,7 @@ tasks:
   json:
     desc: Validate JSON files
     cmds:
-      - find . -name '*.json' -not -path './.git/*' -exec check-json {} +
+      - find . -name '*.json' -not -path './.git/*' -not -path './.claude/logs/*' -exec check-json {} +
 
   actionlint:
     desc: Lint GitHub Actions workflows
