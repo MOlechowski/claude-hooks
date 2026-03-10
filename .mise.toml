@@ -1,5 +1,6 @@
 # Base tool versions — shared across all environments
 [tools]
+uv = "latest"
 actionlint = "latest"
 cocogitto = "7"
 gitleaks = "latest"
