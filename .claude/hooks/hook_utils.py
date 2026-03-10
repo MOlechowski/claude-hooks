@@ -42,7 +42,7 @@ def log(event_type, data=None, base_filename="hook"):
     if data:
         json_entry.update(data)
     
-    # Append to JSON file with pretty formatting
-    json_path = os.path.join(LOGS_DIR, f"{base_filename}.json")
-    with open(json_path, 'a') as f:
-        f.write(json.dumps(json_entry, indent=2) + '\n')
+    # Append as JSONL (one JSON object per line)
+    jsonl_path = os.path.join(LOGS_DIR, f"{base_filename}.jsonl")
+    with open(jsonl_path, 'a') as f:
+        f.write(json.dumps(json_entry) + '\n')
