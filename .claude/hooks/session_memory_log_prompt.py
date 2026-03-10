@@ -8,9 +8,7 @@ import os
 import sys
 from datetime import datetime
 
-from hook_utils import parse_hook_input
-
-MEMORY_DIR = os.path.join(os.path.expanduser("~"), ".claude", "session-memory")
+from hook_utils import parse_hook_input, MEMORY_DIR
 MAX_PROMPT_LENGTH = 2000
 
 
