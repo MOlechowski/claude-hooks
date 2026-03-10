@@ -1,5 +1,5 @@
 {
   "name": "hook-security",
-  "version": "1.0.0",
-  "description": "PreToolUse hook that blocks dangerous commands (git commit --no-verify). Logs security blocks to ~/.claude/logs/security/."
+  "version": "1.1.0",
+  "description": "PreToolUse hook that blocks dangerous commands via configurable rules.json. Logs security events to ~/.claude/logs/security/."
 }

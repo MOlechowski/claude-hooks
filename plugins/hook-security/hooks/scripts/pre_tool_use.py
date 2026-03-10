@@ -1,45 +1,33 @@
 #!/usr/bin/env python3
-"""PreToolUse hook: block dangerous CLI commands and log security events"""
+"""PreToolUse hook: block dangerous CLI commands via configurable rules.json."""
 
 import json
 import os
-import shlex
 import sys
 from datetime import datetime
+from pathlib import Path
 
-# === LOG DIRECTORY ===
+# Allow imports from the scripts directory
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+
+from core.config_loader import load_rules  # noqa: E402
+from core.rule_engine import RuleEngine  # noqa: E402
+
 LOGS_DIR = os.path.join(os.path.expanduser("~"), ".claude", "logs", "security")
-
-# === CONFIGURATION ===
-# Add rules to block specific commands. Example:
-#
-# BLOCKED_TOOLS = {
-#     "Bash": {
-#         "git": {
-#             "commit": {
-#                 "flags": ["--no-verify", "-n"],
-#                 "message": "Cannot execute: git commit with --no-verify bypasses pre-commit hooks."
-#             }
-#         }
-#     }
-# }
-BLOCKED_TOOLS = {
-    "Bash": {}
-}
+RULES_PATH = Path(__file__).resolve().parent.parent.parent / "rules.json"
 
 
-# === UTILITIES ===
 def parse_hook_input():
-    """Parse JSON input from stdin"""
+    """Parse JSON input from stdin."""
     try:
         return json.loads(sys.stdin.read())
     except json.JSONDecodeError:
-        print("Error: Invalid JSON input", file=sys.stderr)
+        print("hook-security: invalid JSON input", file=sys.stderr)
         sys.exit(1)
 
 
 def log(event_type, data=None):
-    """Append a JSONL entry to security.jsonl"""
+    """Append a JSONL entry to security.jsonl."""
     os.makedirs(LOGS_DIR, exist_ok=True)
     entry = {"timestamp": datetime.now().isoformat(), "event_type": event_type}
     if data:
@@ -48,53 +36,51 @@ def log(event_type, data=None):
         f.write(json.dumps(entry) + "\n")
 
 
-# === CHECKING LOGIC ===
-def check_bash_command(tokens):
-    """Check Bash commands against rules. Returns (should_block, message)"""
-    if not tokens:
-        return False, ""
-
-    program = tokens[0]
-    program_rules = BLOCKED_TOOLS["Bash"].get(program, {})
-
-    if len(tokens) > 1 and tokens[1] in program_rules:
-        sub_rules = program_rules[tokens[1]]
-        if any(flag in tokens for flag in sub_rules.get("flags", [])):
-            return True, sub_rules.get("message", "")
-
-    return False, ""
-
-
-# === MAIN ===
 def main():
     hook_input = parse_hook_input()
 
-    tool_input = hook_input.get("tool_input", {})
+    rules = load_rules(RULES_PATH, event="bash")
+
+    if rules is None:
+        # Missing file → allow (no rules = nothing to block)
+        # Malformed file → error already printed to stderr
+        sys.exit(0) if not RULES_PATH.is_file() else sys.exit(1)
+
+    if not rules:
+        sys.exit(0)
+
+    engine = RuleEngine()
+    result = engine.evaluate_rules(rules, hook_input)
+
+    if not result:
+        sys.exit(0)
+
     session_id = hook_input.get("session_id", "")
-    cmd = tool_input.get("command", "")
+    command = hook_input.get("tool_input", {}).get("command", "")
+
+    # Determine if this is a block or warn
+    is_block = "hookSpecificOutput" in result
 
     try:
-        tokens = shlex.split(cmd) if cmd else []
-    except ValueError:
-        tokens = cmd.split() if cmd else []
-
-    should_block, message = check_bash_command(tokens)
-
-    if should_block:
-        try:
-            log("security_block", {
+        log(
+            "security_block" if is_block else "security_warn",
+            {
                 "session_id": session_id,
-                "command": cmd,
-                "action": "blocked",
-                "message": message,
-            })
-        except OSError:
-            pass
+                "command": command,
+                "action": "blocked" if is_block else "warned",
+                "message": result.get("systemMessage", ""),
+            },
+        )
+    except OSError:
+        pass
 
-        print(f"Command blocked: {message}", file=sys.stderr)
+    # Output structured response for Claude Code hooks protocol
+    print(json.dumps(result))
+
+    if is_block:
         sys.exit(2)
-
-    sys.exit(0)
+    else:
+        sys.exit(0)
 
 
 if __name__ == "__main__":
