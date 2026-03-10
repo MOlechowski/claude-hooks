@@ -11,19 +11,20 @@ from datetime import datetime
 LOGS_DIR = os.path.join(os.path.expanduser("~"), ".claude", "logs", "security")
 
 # === CONFIGURATION ===
+# Add rules to block specific commands. Example:
+#
+# BLOCKED_TOOLS = {
+#     "Bash": {
+#         "git": {
+#             "commit": {
+#                 "flags": ["--no-verify", "-n"],
+#                 "message": "Cannot execute: git commit with --no-verify bypasses pre-commit hooks."
+#             }
+#         }
+#     }
+# }
 BLOCKED_TOOLS = {
-    "Bash": {
-        "git": {
-            "commit": {
-                "flags": ["--no-verify", "-n"],
-                "message": (
-                    "Cannot execute: git commit with --no-verify flag bypasses "
-                    "pre-commit hooks and may introduce issues. Consider running "
-                    "without --no-verify to ensure code quality checks pass."
-                )
-            }
-        }
-    }
+    "Bash": {}
 }
 
 
