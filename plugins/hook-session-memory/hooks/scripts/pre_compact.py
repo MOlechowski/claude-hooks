@@ -100,43 +100,6 @@ def try_claude_cli(prompt):
     return None
 
 
-def try_api_call(prompt):
-    """Try structuring via direct API call (requires ANTHROPIC_API_KEY)"""
-    api_key = os.environ.get("ANTHROPIC_API_KEY", "")
-    if not api_key:
-        return None
-
-    payload = json.dumps({
-        "model": "claude-haiku-4-5-20251001",
-        "max_tokens": 4096,
-        "messages": [{"role": "user", "content": prompt}],
-    })
-
-    try:
-        result = subprocess.run(
-            [
-                "curl", "-s", "--max-time", "45",
-                "-H", f"x-api-key: {api_key}",
-                "-H", "anthropic-version: 2023-06-01",
-                "-H", "content-type: application/json",
-                "https://api.anthropic.com/v1/messages",
-                "-d", payload,
-            ],
-            capture_output=True,
-            text=True,
-            timeout=50,
-        )
-        if result.returncode == 0:
-            resp = json.loads(result.stdout)
-            text = resp.get("content", [{}])[0].get("text", "")
-            if text:
-                return text
-    except (subprocess.TimeoutExpired, OSError, json.JSONDecodeError, (KeyError, IndexError)):
-        pass
-
-    return None
-
-
 def main():
     hook_input = parse_hook_input()
     session_id = hook_input.get("session_id", "")
@@ -160,8 +123,6 @@ def main():
     prompt = STRUCTURING_PROMPT + log_content
 
     structured = try_claude_cli(prompt)
-    if not structured:
-        structured = try_api_call(prompt)
 
     if structured:
         print(

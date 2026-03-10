@@ -26,10 +26,7 @@ Blocks dangerous CLI commands before execution.
 |------------|---------|--------|
 | PreToolUse | `Bash` | Block commands matching `BLOCKED_TOOLS` rules |
 
-**Default rules:**
-- `git commit --no-verify` / `git commit -n` — blocked with explanation
-
-**Extending rules:** Edit `BLOCKED_TOOLS` in `plugins/hook-security/hooks/scripts/pre_tool_use.py` to add patterns for `rm`, `sudo`, `docker`, etc.
+Ships with no default rules. Edit `BLOCKED_TOOLS` in `plugins/hook-security/hooks/scripts/pre_tool_use.py` to add your own blocking patterns (`git`, `rm`, `sudo`, `docker`, etc.).
 
 ### hook-observability
 
@@ -83,8 +80,7 @@ claude --plugin-dir ./plugins/hook-security --plugin-dir ./plugins/hook-observab
 
 ## Known Limitations
 
-- Plugin hooks fire in Claude Code CLI only (not VSCode extension — [known bug](https://github.com/anthropics/claude-code/issues))
-- `pre_compact.py` requires either `claude` CLI on PATH or `ANTHROPIC_API_KEY` env var for structured notes; falls back to raw log injection otherwise
+- `pre_compact.py` requires `claude` CLI on PATH for structured notes; falls back to raw log injection otherwise
 
 ## License
 
