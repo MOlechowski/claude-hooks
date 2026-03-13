@@ -1,3 +1,6 @@
 # Development profile — additional tools for local work
 [tools]
 lefthook = "latest"
+
+[hooks]
+enter = "lefthook install"
