@@ -9,3 +9,6 @@ ruff = "latest"
 task = "3"
 "pipx:pre-commit-hooks" = "latest"
 "pipx:yamllint" = "latest"
+
+[settings]
+experimental = true
