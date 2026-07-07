@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+#MISE description="Validate JSON files"
+set -euo pipefail
+
+find . -name '*.json' -not -path './.git/*' -not -path './.claude/logs/*' -exec check-json {} +

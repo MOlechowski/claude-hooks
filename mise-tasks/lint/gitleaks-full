@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+#MISE description="Check entire repo for secrets"
+set -euo pipefail
+
+gitleaks detect --verbose

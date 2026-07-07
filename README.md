@@ -81,8 +81,8 @@ claude --plugin-dir ./plugins/hook-security --plugin-dir ./plugins/hook-observab
 ## Development
 
 ```bash
-task setup         # Install tools (mise) and git hooks (lefthook)
-task lint          # Run all linters
+mise run setup:default   # Install tools (mise) and git hooks (lefthook)
+mise run lint:default    # Run all linters
 ```
 
 Requires [mise](https://mise.jdx.dev/) for tool management. See `.mise.toml` for tool versions.

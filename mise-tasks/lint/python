@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+#MISE description="Lint Python files"
+set -euo pipefail
+
+ruff check plugins/

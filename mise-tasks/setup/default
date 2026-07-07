@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+#MISE description="Install tools and configure git hooks"
+set -euo pipefail
+
+mise install
+MISE_ENV=development mise install
+MISE_ENV=development mise exec -- lefthook install
