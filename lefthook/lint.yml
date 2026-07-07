@@ -2,14 +2,14 @@ pre-commit:
   parallel: true
   commands:
     actionlint:
-      glob: ".github/workflows/*.yml"
-      run: task lint:actionlint
+      glob: ".github/workflows/*.{yaml,yml}"
+      run: actionlint -color -oneline {staged_files}
       fail_text: "actionlint found issues"
     yamllint:
       glob: "*.{yaml,yml}"
-      run: task lint:yamllint
+      run: yamllint --strict {staged_files}
       fail_text: "yamllint found issues"
     markdownlint:
       glob: "*.md"
-      run: task lint:markdownlint
+      run: markdownlint-cli2 {staged_files}
       fail_text: "markdownlint found issues"

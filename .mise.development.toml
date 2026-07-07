@@ -1,6 +1,9 @@
 # Development profile — additional tools for local work
 [tools]
-lefthook = "latest"
+lefthook = "2.1.9"
+
+[settings]
+experimental = true
 
 [hooks]
-enter = "lefthook install"
+enter = '[ "$(git rev-parse --is-inside-work-tree 2>/dev/null)" = "true" ] && lefthook install'

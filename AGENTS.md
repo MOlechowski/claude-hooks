@@ -11,7 +11,7 @@ A plugin marketplace for Claude Code hooks providing security, observability, se
 This repository contains 4 self-contained Claude Code hook plugins distributed via the plugin marketplace. Each plugin lives under `plugins/` with its own `hooks.json` and Python scripts.
 
 **Language:** Python 3.10+
-**Tooling:** mise (tool versions), Taskfile (task runner), lefthook (git hooks)
+**Tooling:** mise (tool versions + task runner via mise-tasks/), lefthook (git hooks)
 **CI:** GitHub Actions — lint on push/PR to master
 
 ## Repository Structure
@@ -60,13 +60,12 @@ This repository contains 4 self-contained Claude Code hook plugins distributed v
 │               ├── log_prompt.py     # UserPromptSubmit: log user messages
 │               ├── log_tool.py       # PostToolUse: log tool summaries
 │               └── pre_compact.py    # PreCompact: structure notes via claude -p
-├── taskfiles/                    # Taskfile includes
-│   ├── ci.yml                    # CI-specific tasks
-│   ├── lint.yml                  # Linter tasks (ruff, json, actionlint, yamllint, markdownlint)
-│   └── setup.yml                 # Setup tasks (mise install, lefthook install)
-├── .mise.toml                    # Tool versions: ruff, task, actionlint, cocogitto, gitleaks, etc.
+├── mise-tasks/                    # mise task runner (file-based tasks)
+│   ├── lint/                      # lint:python, lint:json, lint:actionlint, lint:yamllint, lint:markdownlint, lint:gitleaks, lint:gitleaks-full, lint:default
+│   ├── setup/                     # setup:default (mise install, lefthook install)
+│   └── test/                      # test:security, test:default
+├── .mise.toml                    # Tool versions: ruff, actionlint, cocogitto, gitleaks, etc.
 ├── lefthook.yml                  # Lefthook entry point — extends lefthook/*.yml
-├── Taskfile.yml                  # Taskfile entry point — includes taskfiles/*.yml
 └── README.md
 ```
 
@@ -99,16 +98,16 @@ plugins/<name>/
 ### Linting
 
 ```bash
-task lint          # Run all linters
-task lint:python   # Ruff only
-task lint:json     # JSON validation
-task lint:yamllint # YAML lint
+mise run lint:default    # Run all linters
+mise run lint:python     # Ruff only
+mise run lint:json       # JSON validation
+mise run lint:yamllint   # YAML lint
 ```
 
 ### Setup
 
 ```bash
-task setup         # Install tools (mise) and git hooks (lefthook)
+mise run setup:default   # Install tools (mise) and git hooks (lefthook)
 ```
 
 ### Testing Plugins Locally
@@ -124,5 +123,5 @@ claude --plugin-dir ./plugins/hook-rule-reinforcement
 
 - **Branch:** feature branches off master
 - **Commits:** conventional commits enforced by cocogitto (via lefthook pre-commit and CI)
-- **CI:** `lint.yml` runs `task lint` on push/PR; commit-lint on PRs only
+- **CI:** `lint.yml` runs `mise run lint:default` on push/PR; commit-lint on PRs only
 - **Merge:** PRs to master

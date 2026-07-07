@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+#MISE description="Run hook-security tests (unit + integration)"
+set -euo pipefail
+
+uv run -m unittest discover -s plugins/hook-security/hooks/scripts/tests -v
